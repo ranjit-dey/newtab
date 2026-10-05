@@ -78,12 +78,12 @@ customize-chrome-button,
   will-change: transform, filter;
 }
 
-/* Uniform subtle tint overlay without dark center spot */
+/* Clean subtle tint overlay without any dark center spot */
 #bg-overlay {
   position: fixed;
   inset: 0;
   z-index: 1;
-  background: rgba(0, 0, 0, 0.18);
+  background: rgba(0, 0, 0, 0.08);
   pointer-events: none;
 }
 
@@ -499,7 +499,7 @@ body.app-loaded #app-viewport {
   transform: translateY(-2px);
 }
 
-/* Compact Search Engine Dropdown in Searchbar */
+/* Ultra-Compact Search Engine Dropdown in Searchbar */
 .search-engine-custom-container {
   flex-shrink: 0;
   width: auto;
@@ -511,20 +511,26 @@ body.app-loaded #app-viewport {
 
 .search-engine-custom-container .custom-dropdown-trigger {
   width: auto;
-  min-width: 90px;
-  max-width: 120px;
-  padding: 5px 10px;
-  font-size: 0.82rem;
+  min-width: 76px;
+  max-width: 104px;
+  padding: 3px 8px;
+  font-size: 0.78rem;
+  font-weight: 500;
   border-radius: var(--radius-full);
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  gap: 6px;
-  height: 38px;
+  gap: 4px;
+  height: 34px;
+}
+
+.search-engine-custom-container .custom-dropdown-trigger:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 .search-engine-custom-container .custom-dropdown-menu {
-  min-width: 160px;
-  width: 160px;
+  min-width: 150px;
+  width: 150px;
 }
 
 .search-divider {
@@ -1467,17 +1473,20 @@ body.app-loaded #app-viewport {
 
 #timer-modal {
   width: 90%;
-  max-width: 460px;
-  padding: 34px 36px;
+  max-width: 480px;
+  padding: 38px 42px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
 }
 
 .timer-modes {
   display: flex;
   background: rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-full);
-  padding: 4px;
-  gap: 4px;
-  margin-bottom: 18px;
+  padding: 5px;
+  gap: 5px;
+  margin-bottom: 20px;
 }
 
 .timer-mode-btn {
@@ -1503,7 +1512,7 @@ body.app-loaded #app-viewport {
   position: relative;
   width: 190px;
   height: 190px;
-  margin: 0 auto 14px;
+  margin: 10px auto 20px;
   display: flex;
   align-items: center;
   justify-content: center;
