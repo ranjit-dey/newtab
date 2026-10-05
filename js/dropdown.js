@@ -21,7 +21,7 @@ class CustomDropdown {
     const selectedItem = this.items.find(i => i.value === this.value) || this.items[0] || { label: '', value: '' };
 
     this.container.innerHTML = `
-      <button type="button" class="custom-dropdown-trigger glass-interactive" aria-haspopup="listbox" aria-expanded="false">
+      <button type="button" class="custom-dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
         <span class="custom-dropdown-left-group">
           ${selectedItem.icon ? `<span class="custom-dropdown-current-icon">${selectedItem.icon}</span>` : ''}
           <span class="custom-dropdown-label">${selectedItem.label}</span>

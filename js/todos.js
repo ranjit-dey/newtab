@@ -110,6 +110,11 @@ class TodoManager {
       });
     }
 
+    const hasCompleted = this.todos.some(t => t.done);
+    if (this.clearCompletedBtn) {
+      this.clearCompletedBtn.style.display = hasCompleted ? 'inline-block' : 'none';
+    }
+
     this.updateBadge();
   }
 

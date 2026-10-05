@@ -33,7 +33,9 @@ const DEFAULT_SETTINGS = {
   showShortcuts: true,
   showQuotes: true,
   showTodos: true,
-  showNotes: true
+  showNotes: true,
+  showFooter: true,
+  showHeader: true
 };
 
 const SEARCH_ENGINES = {
@@ -168,7 +170,9 @@ class SettingsManager {
       'shortcuts-container': this.settings.showShortcuts,
       'quote-container': this.settings.showQuotes,
       'todo-toggle-btn': this.settings.showTodos,
-      'notes-toggle-btn': this.settings.showNotes
+      'notes-toggle-btn': this.settings.showNotes,
+      'bottom-footer': this.settings.showFooter !== false,
+      'top-header': this.settings.showHeader !== false
     };
 
     for (const [id, visible] of Object.entries(mapping)) {
@@ -502,13 +506,15 @@ class SettingsManager {
       { id: 'toggle-widget-shortcuts', key: 'showShortcuts' },
       { id: 'toggle-widget-quotes', key: 'showQuotes' },
       { id: 'toggle-widget-todos', key: 'showTodos' },
-      { id: 'toggle-widget-notes', key: 'showNotes' }
+      { id: 'toggle-widget-notes', key: 'showNotes' },
+      { id: 'toggle-widget-footer', key: 'showFooter' },
+      { id: 'toggle-widget-header', key: 'showHeader' }
     ];
 
     widgetToggles.forEach(({ id, key }) => {
       const toggle = document.getElementById(id);
       if (toggle) {
-        toggle.checked = this.settings[key];
+        toggle.checked = this.settings[key] !== false;
         toggle.addEventListener('change', async (e) => {
           this.settings[key] = e.target.checked;
           this.applyWidgetVisibilities();
@@ -516,6 +522,37 @@ class SettingsManager {
         });
       }
     });
+
+    // Open Chrome Appearance Settings Button
+    const openAppearanceBtn = document.getElementById('btn-open-appearance');
+    if (openAppearanceBtn) {
+      openAppearanceBtn.addEventListener('click', () => {
+        try {
+          if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.create) {
+            chrome.tabs.create({ url: 'chrome://settings/appearance' });
+          } else {
+            window.open('chrome://settings/appearance', '_blank');
+          }
+        } catch (e) {
+          window.open('chrome://settings/appearance', '_blank');
+        }
+      });
+    }
+
+    // Footer Native Bar Tip Button
+    const showFooterTipBtn = document.getElementById('btn-show-footer-tip');
+    if (showFooterTipBtn) {
+      showFooterTipBtn.addEventListener('click', () => {
+        const banner = document.getElementById('footer-tip-banner');
+        if (banner) {
+          banner.style.display = 'flex';
+          banner.classList.add('visible');
+          // Close settings window so user can clearly see the banner at bottom
+          document.getElementById('settings-drawer')?.classList.remove('open');
+          document.getElementById('modal-backdrop')?.classList.remove('active');
+        }
+      });
+    }
 
     // Backup & Export JSON
     const exportBtn = document.getElementById('backup-export-btn');
@@ -545,7 +582,9 @@ class SettingsManager {
               await this.save();
               location.reload();
             } catch (err) {
-              alert('Invalid settings file format.');
+              if (window.showCustomAlert) {
+                window.showCustomAlert('Import Error', 'The selected JSON file has an invalid format.');
+              }
             }
           };
           reader.readAsText(file);
@@ -554,13 +593,20 @@ class SettingsManager {
     }
 
     // Reset button
-    const resetBtn = document.getElementById('settings-reset-btn');
+    const resetBtn = document.getElementById('backup-reset-btn') || document.getElementById('settings-reset-btn');
     if (resetBtn) {
-      resetBtn.addEventListener('click', async () => {
-        if (confirm('Reset all preferences to defaults?')) {
-          this.settings = { ...DEFAULT_SETTINGS };
-          await this.save();
-          location.reload();
+      resetBtn.addEventListener('click', () => {
+        if (window.showCustomConfirm) {
+          window.showCustomConfirm(
+            'Reset Preferences',
+            'Are you sure you want to reset all preferences to their factory defaults? Your custom shortcuts will also be restored to default.',
+            async () => {
+              this.settings = { ...DEFAULT_SETTINGS };
+              await this.save();
+              location.reload();
+            },
+            true
+          );
         }
       });
     }

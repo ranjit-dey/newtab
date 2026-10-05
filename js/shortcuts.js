@@ -2,14 +2,10 @@
  * Aura Tab - Speed Dial / Shortcuts Manager
  */
 const DEFAULT_SHORTCUTS = [
-  { id: '1', title: 'Google', url: 'https://www.google.com' },
-  { id: '2', title: 'YouTube', url: 'https://www.youtube.com' },
-  { id: '3', title: 'GitHub', url: 'https://www.github.com' },
-  { id: '4', title: 'ChatGPT', url: 'https://chatgpt.com' },
-  { id: '5', title: 'Reddit', url: 'https://www.reddit.com' },
-  { id: '6', title: 'Twitter / X', url: 'https://x.com' },
-  { id: '7', title: 'Wikipedia', url: 'https://www.wikipedia.org' },
-  { id: '8', title: 'Spotify', url: 'https://open.spotify.com' }
+  { id: '1', title: 'YouTube', url: 'https://www.youtube.com' },
+  { id: '2', title: 'GitHub', url: 'https://www.github.com' },
+  { id: '3', title: 'ChatGPT', url: 'https://chatgpt.com' },
+  { id: '4', title: 'Management', url: 'https://management.kalolwala.com/users' },
 ];
 
 class ShortcutManager {
@@ -38,7 +34,7 @@ class ShortcutManager {
     try {
       return new URL(url).hostname[0].toUpperCase();
     } catch (e) {
-      return '★';
+      return '•';
     }
   }
 

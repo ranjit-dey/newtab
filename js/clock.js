@@ -114,49 +114,55 @@ class ClockWidget {
   }
 
   /**
-   * Safely updates a digit container without accumulating multiple digits side-by-side.
+   * Butter-smooth digit update with absolute layers that never collapse box width or shift layout.
    */
   updateDigit(boxEl, newVal, allowSlide) {
     if (!boxEl) return;
 
-    // If first tick, background tab, or slide not allowed, directly set text
-    if (!allowSlide || boxEl.textContent.trim() === newVal) {
-      boxEl.textContent = newVal;
+    if (!allowSlide) {
+      boxEl.innerHTML = `<span class="digit-slide-layer slide-active">${newVal}</span>`;
       return;
     }
 
-    const oldVal = boxEl.textContent.trim() || newVal;
+    const activeLayer = boxEl.querySelector('.digit-slide-layer.slide-active');
+    const oldVal = activeLayer ? activeLayer.textContent.trim() : boxEl.textContent.trim();
 
-    // Clear any previous child nodes to guarantee zero accumulation
-    boxEl.innerHTML = '';
-
-    // Create a strict vertical roller container
-    const rollContainer = document.createElement('div');
-    rollContainer.className = 'digit-roll-wrapper';
-
-    const oldSpan = document.createElement('div');
-    oldSpan.className = 'digit-roll-item digit-roll-old';
-    oldSpan.textContent = oldVal;
-
-    const newSpan = document.createElement('div');
-    newSpan.className = 'digit-roll-item digit-roll-new';
-    newSpan.textContent = newVal;
-
-    rollContainer.appendChild(oldSpan);
-    rollContainer.appendChild(newSpan);
-    boxEl.appendChild(rollContainer);
-
-    // Trigger vertical slide animation
-    requestAnimationFrame(() => {
-      rollContainer.classList.add('rolling');
-    });
-
-    // Clean up immediately after animation finishes into pure text
-    setTimeout(() => {
-      if (boxEl.contains(rollContainer)) {
-        boxEl.textContent = newVal;
+    if (oldVal === newVal) {
+      if (!activeLayer) {
+        boxEl.innerHTML = `<span class="digit-slide-layer slide-active">${newVal}</span>`;
       }
-    }, 380);
+      return;
+    }
+
+    // Ensure we have a base active layer without clearing innerHTML
+    if (!activeLayer) {
+      boxEl.innerHTML = `<span class="digit-slide-layer slide-active">${oldVal || newVal}</span>`;
+    }
+    const currentLayer = boxEl.querySelector('.digit-slide-layer.slide-active');
+
+    // Create next layer starting from bottom
+    const nextLayer = document.createElement('span');
+    nextLayer.className = 'digit-slide-layer slide-in';
+    nextLayer.textContent = newVal;
+    boxEl.appendChild(nextLayer);
+
+    // Force style flush
+    void nextLayer.offsetWidth;
+
+    // Trigger synchronized slide
+    if (currentLayer) {
+      currentLayer.classList.remove('slide-active');
+      currentLayer.classList.add('slide-out');
+    }
+    nextLayer.classList.remove('slide-in');
+    nextLayer.classList.add('slide-active');
+
+    // Clean up old layer after animation
+    setTimeout(() => {
+      if (currentLayer && currentLayer.parentNode === boxEl) {
+        boxEl.removeChild(currentLayer);
+      }
+    }, 450);
   }
 }
 

@@ -10,6 +10,7 @@ class FocusTimer {
     this.currentMode = 'pomodoro'; // pomodoro, short, long, custom
     this.completedToday = 0;
 
+    this.modal = document.getElementById('timer-modal');
     this.displayEl = document.getElementById('timer-display');
     this.pillEl = document.getElementById('timer-pill-display');
     this.startBtn = document.getElementById('timer-start-btn');
@@ -140,6 +141,10 @@ class FocusTimer {
 
   switchMode(mode) {
     this.pause();
+    if (this.modal) {
+      this.modal.classList.remove('timer-running');
+      this.modal.classList.remove('timer-paused');
+    }
     this.currentMode = mode;
     let mins = this.focusMins || 25;
     if (mode === 'short') mins = this.shortBreakMins || 5;
@@ -172,10 +177,15 @@ class FocusTimer {
     this.isRunning = true;
     this.endTime = Date.now() + (this.remainingSeconds * 1000);
 
+    if (this.modal) {
+      this.modal.classList.add('timer-running');
+      this.modal.classList.remove('timer-paused');
+    }
+
     if (this.startBtn) this.startBtn.innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-        <rect x="6" y="4" width="4" height="16"></rect>
-        <rect x="14" y="4" width="4" height="16"></rect>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+        <rect x="14" y="4" width="4" height="16" rx="1"></rect>
       </svg>
       <span>Pause</span>
     `;
@@ -201,21 +211,41 @@ class FocusTimer {
     }
     clearInterval(this.timerId);
     this.timerId = null;
+
+    if (this.modal) {
+      this.modal.classList.remove('timer-running');
+      this.modal.classList.add('timer-paused');
+    }
+
     if (this.startBtn) this.startBtn.innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
         <polygon points="5 3 19 12 5 21 5 3"></polygon>
       </svg>
-      <span>Start</span>
+      <span>Resume</span>
     `;
     document.title = 'New Tab';
   }
 
   reset() {
+    if (this.modal) {
+      this.modal.classList.remove('timer-running');
+      this.modal.classList.remove('timer-paused');
+    }
     this.switchMode(this.currentMode);
+    if (this.startBtn) this.startBtn.innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+      </svg>
+      <span>Start</span>
+    `;
   }
 
   async onComplete() {
     this.pause();
+    if (this.modal) {
+      this.modal.classList.remove('timer-running');
+      this.modal.classList.remove('timer-paused');
+    }
 
     const chimeType = window.SettingsManager?.settings?.timerSound || 'haptic';
     try {

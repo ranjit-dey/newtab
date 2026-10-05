@@ -9,6 +9,9 @@
   "permissions": [
     "storage"
   ],
+  "host_permissions": [
+    "https://*/*"
+  ],
   "action": {
     "default_title": "New Tab"
   },

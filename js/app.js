@@ -1,4 +1,98 @@
 /**
+ * Custom Modal Alerts & Confirms (Rule 5: No browser alert/confirm)
+ */
+window.showCustomAlert = (title, message) => {
+  const modal = document.getElementById('custom-dialog-modal');
+  const backdrop = document.getElementById('modal-backdrop');
+  if (!modal) return;
+  const titleEl = document.getElementById('custom-dialog-title');
+  const msgEl = document.getElementById('custom-dialog-message');
+  const iconEl = document.getElementById('custom-dialog-icon');
+  const cancelBtn = document.getElementById('custom-dialog-cancel');
+  const confirmBtn = document.getElementById('custom-dialog-confirm');
+
+  if (titleEl) titleEl.textContent = title || 'Notice';
+  if (msgEl) msgEl.textContent = message || '';
+
+  if (iconEl) {
+    iconEl.className = 'custom-dialog-badge badge-info';
+    iconEl.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+  }
+
+  if (cancelBtn) cancelBtn.style.display = 'none';
+  if (confirmBtn) {
+    confirmBtn.className = 'btn-dialog-primary';
+    confirmBtn.textContent = 'OK';
+    confirmBtn.onclick = () => {
+      modal.classList.remove('open');
+      backdrop?.classList.remove('active');
+    };
+  }
+  const closeBtn = document.getElementById('custom-dialog-close');
+  if (closeBtn) {
+    closeBtn.onclick = () => {
+      modal.classList.remove('open');
+      backdrop?.classList.remove('active');
+    };
+  }
+  backdrop?.classList.add('active');
+  modal.classList.add('open');
+};
+
+window.showCustomConfirm = (title, message, onConfirm, isDanger = false) => {
+  const modal = document.getElementById('custom-dialog-modal');
+  const backdrop = document.getElementById('modal-backdrop');
+  if (!modal) return;
+  const titleEl = document.getElementById('custom-dialog-title');
+  const msgEl = document.getElementById('custom-dialog-message');
+  const iconEl = document.getElementById('custom-dialog-icon');
+  const cancelBtn = document.getElementById('custom-dialog-cancel');
+  const confirmBtn = document.getElementById('custom-dialog-confirm');
+
+  if (titleEl) titleEl.textContent = title || 'Confirm';
+  if (msgEl) msgEl.textContent = message || '';
+
+  const destructive = isDanger || /reset|delete|remove|clear/i.test(title || '');
+  if (iconEl) {
+    if (destructive) {
+      iconEl.className = 'custom-dialog-badge badge-danger';
+      iconEl.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+    } else {
+      iconEl.className = 'custom-dialog-badge badge-info';
+      iconEl.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+    }
+  }
+
+  if (cancelBtn) {
+    cancelBtn.style.display = 'inline-flex';
+    cancelBtn.onclick = () => {
+      modal.classList.remove('open');
+      backdrop?.classList.remove('active');
+    };
+  }
+  if (confirmBtn) {
+    confirmBtn.className = destructive ? 'btn-dialog-danger' : 'btn-dialog-primary';
+    confirmBtn.textContent = destructive
+      ? ((title || '').toLowerCase().includes('reset') ? 'Reset Everything' : ((title || '').toLowerCase().includes('delete') ? 'Delete' : 'Confirm'))
+      : 'Confirm';
+    confirmBtn.onclick = () => {
+      modal.classList.remove('open');
+      backdrop?.classList.remove('active');
+      if (typeof onConfirm === 'function') onConfirm();
+    };
+  }
+  const closeBtn = document.getElementById('custom-dialog-close');
+  if (closeBtn) {
+    closeBtn.onclick = () => {
+      modal.classList.remove('open');
+      backdrop?.classList.remove('active');
+    };
+  }
+  backdrop?.classList.add('active');
+  modal.classList.add('open');
+};
+
+/**
  * Main Application Coordinator
  */
 class MainApp {
@@ -169,7 +263,7 @@ class MainApp {
               stream.getTracks().forEach(track => track.stop());
             } catch (err) {
               console.warn('Microphone permission error:', err);
-              alert('Microphone permission is required for voice search. Please allow microphone access in your browser settings.');
+              window.showCustomAlert('Microphone Access', 'Microphone permission is required for voice search. Please enable microphone access in your browser settings.');
               return;
             }
           }
@@ -202,7 +296,7 @@ class MainApp {
               console.warn('Speech recognition error:', e.error);
               stopListening();
               if (e.error === 'not-allowed') {
-                alert('Microphone access was blocked. Please enable it in browser settings.');
+                window.showCustomAlert('Microphone Blocked', 'Microphone access was blocked. Please enable it in browser settings.');
               }
             };
 
